@@ -4,8 +4,7 @@ from typing import List, Optional, Dict, Any, Tuple, Union
 from pydantic import ValidationError
 from urllib.parse import urljoin # <-- NIEUWE IMPORT
 
-# FIX: Relatieve import van de registry
-# Aanname: flowsint_enricher is hier geregistreerd
+from flowsint_enrichers.registry import flowsint_enricher
 from flowsint_core.core.enricher_base import Enricher
 from flowsint_core.core.logger import Logger
 from flowsint_types.email import Email
@@ -15,7 +14,7 @@ from flowsint_types.leak import Leak
 # Standaard URL, wordt overschreven door Flowsint parameters indien aanwezig
 DEFAULT_BASE_URL = "https://breach.vip/api/search"
 
-
+@flowsint_enricher
 class EmailToBreachVipEnricher(Enricher):
     """Zoekt e-mailadressen op in de BreachVIP-database."""
 

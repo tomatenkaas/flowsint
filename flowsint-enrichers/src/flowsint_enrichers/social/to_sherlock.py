@@ -1,22 +1,23 @@
-from typing import List
+import subprocess
+from pathlib import Path
+from typing import List, Union
+from flowsint_core.utils import is_valid_username
+from flowsint_types import SocialAccount, Username
 from flowsint_core.core.enricher_base import Enricher
 from flowsint_enrichers.registry import flowsint_enricher
 from flowsint_core.core.logger import Logger
-from flowsint_types import SocialAccount, Username 
-from tools.social.sherlock import SherlockTool 
 
-# Import the decorator if needed
-# from flowsint_enrichers.registry import flowsint_enricher
-
+@flowsint_enricher
 class SherlockEnricher(Enricher):
-    """Scans usernames for linked social accounts using the Sherlock Tool."""
+    """[SHERLOCK] Scans the usernames for associated social accounts using Sherlock."""
 
+    # Define types as class attributes - base class handles schema generation automatically
     InputType = Username
     OutputType = SocialAccount
 
     @classmethod
     def name(cls) -> str:
-        return "username_to_socials_sherlock_tool" 
+        return "username_to_socials_sherlock"
 
     @classmethod
     def category(cls) -> str:
@@ -24,73 +25,84 @@ class SherlockEnricher(Enricher):
 
     @classmethod
     def key(cls) -> str:
-        return "value" # Assumed the username field is 'value'
+        return "username"
 
     async def scan(self, data: List[InputType]) -> List[OutputType]:
-        """Call the SherlockTool and convert raw results to SocialAccount types."""
+        """Performs the scan using Sherlock on the list of usernames."""
         results: List[OutputType] = []
-        sherlock_tool = SherlockTool()
 
-        for username_obj in data:
-            username_string = username_obj.value
-
-            Logger.info(self.sketch_id, {"message": f"Calling SherlockTool for {username_string}"})
-
+        for username in data:
+            output_file = Path(f"/tmp/sherlock_{username.value}.txt")
             try:
-                # 1. Call the Tool (this executes the Docker container)
-                found_profiles = sherlock_tool.launch(username_string)
+                # Running the Sherlock command to perform the scan
+                result = subprocess.run(
+                    ["sherlock", username.value, "-o", str(output_file)],
+                    capture_output=True,
+                    text=True,
+                    timeout=100,
+                )
 
-                # 2. Convert raw Tool data into Flowsint Types
-                for hit in found_profiles:
-                    # 'username_obj' is the original Pydantic Username instance
+                if result.returncode != 0:
+                    Logger.error(
+                        self.sketch_id,
+                        {
+                            "message": f"Sherlock failed for {username.value}: {result.stderr.strip()}"
+                        },
+                    )
+                    continue
+
+                if not output_file.exists():
+                    Logger.error(
+                        self.sketch_id,
+                        {
+                            "message": f"Sherlock did not produce any output file for {username.value}."
+                        },
+                    )
+                    continue
+
+                found_accounts = {}
+                with open(output_file, "r") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and line.startswith("http"):
+                            platform = line.split("/")[2]  # Example: twitter.com
+                            found_accounts[platform] = line
+
+                # Create Social objects for each found account
+                for platform, url in found_accounts.items():
                     results.append(
-                        SocialAccount(
-                            username=username_obj,
-                            platform=hit['site'],
-                            profile_url=hit['url']
-                        )
+                        SocialAccount(username=username, platform=platform, profile_url=url)
                     )
 
-                Logger.info(self.sketch_id, {"message": f"Tool found {len(found_profiles)} accounts."})
-
+            except subprocess.TimeoutExpired:
+                Logger.error(
+                    self.sketch_id,
+                    {"message": f"Sherlock scan for {username.value} timed out."},
+                )
             except Exception as e:
-                Logger.error(self.sketch_id, {"message": f"Error calling Sherlock Tool: {e}"})
-                continue
+                Logger.error(
+                    self.sketch_id,
+                    {
+                        "message": f"Unexpected error in Sherlock scan for {username.value}: {str(e)}"
+                    },
+                )
 
         return results
 
     def postprocess(self, results: List[OutputType], original_input: List[InputType]) -> List[OutputType]:
-        """Create the graph nodes and relationships."""
-
-        # The SocialAccount objects carry the original Username object,
-        # which makes it easy to create the relationship.
+        """Create Neo4j relationships for found social accounts."""
+        if not self.neo4j_conn:
+            return results
 
         for social_account in results:
-            # Determine the desired label format: @username (Platform)
-            username_value = social_account.username.value
-            platform_name = social_account.platform
-            
-            # 1. Set the custom label on the social_account object
-            # This explicitly overrides the default label shown in the graph UI.
-            custom_label = f"@{username_value} ({platform_name})"
-            social_account.label = custom_label # The crucial line for custom label
-
-            # 2. Create the node for the found SocialAccount
             self.create_node(social_account)
-
-            # 3. Create the node for the original Username (if it doesn't exist yet)
-            original_username_node = social_account.username
-            self.create_node(original_username_node)
-
-            # 4. Create the relationship: (USERNAME)-[HAS_ACCOUNT]->(SOCIALACCOUNT)
-            self.create_relationship(
-                original_username_node,
-                social_account,
-                "HAS_ACCOUNT"
-            )
-
             self.log_graph_message(
-                f"Account found: {social_account.username.value} on {social_account.platform}"
+                f"Found social account: {social_account.username.value} on {social_account.platform}"
             )
 
         return results
+
+
+# Make types available at module level for easy access
+InputType = SherlockEnricher.InputType
+OutputType = SherlockEnricher.OutputType
