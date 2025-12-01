@@ -2,10 +2,12 @@ import asyncio
 from typing import List
 from flowsint_core.core.logger import Logger
 from flowsint_core.core.enricher_base import Enricher
+from flowsint_enrichers.registry import flowsint_enricher
 from flowsint_types.ip import Ip
 from flowsint_types.domain import Domain
 
 
+@flowsint_enricher
 class IpToDummyDomainsEnricher(Enricher):
     """
     TEST TRANSFORM: Generate dummy domains for testing SSE incremental updates.

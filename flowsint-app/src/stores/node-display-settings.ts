@@ -17,7 +17,6 @@ export type ItemType =
   | 'plane'
   | 'website'
   | 'domain'
-  | 'subdomain'
   | 'document'
   | 'financial'
   | 'event'
@@ -42,7 +41,7 @@ export type ItemType =
   | 'breach'
   | 'webtracker'
   | 'session'
-  | 'dns'
+  | 'dnsrecord'
   | 'ssl'
   | 'message'
   | 'malware'
@@ -74,7 +73,6 @@ export const ITEM_TYPES: ItemType[] = [
   'plane',
   'website',
   'domain',
-  'subdomain',
   'document',
   'financial',
   'event',
@@ -99,7 +97,7 @@ export const ITEM_TYPES: ItemType[] = [
   'breach',
   'webtracker',
   'session',
-  'dns',
+  'dnsrecord',
   'ssl',
   'message',
   'malware',
@@ -131,7 +129,6 @@ const DEFAULT_COLORS: Record<ItemType, string> = {
   plane: '#C1A78E', // brun clair
   website: '#D279A6', // rose pastel
   domain: '#66A892', // vert sauge
-  subdomain: '#F4A261', // bleu ciel
   document: '#8F9CA3', // gris bleuté
   financial: '#E98973', // corail doux
   event: '#6DBBA2', // vert menthe
@@ -156,7 +153,7 @@ const DEFAULT_COLORS: Record<ItemType, string> = {
   breach: '#CC7A7A', // rose chaud
   webtracker: '#C7BF50', // jaune doux
   session: '#A8BF50', // lime atténué
-  dns: '#80BF9F', // vert teal clair
+  dnsrecord: '#BFAF80', // vert teal clair
   ssl: '#BFAF80', // sable chaud
   message: '#897FC9', // violet lavande
   malware: '#4AA29E', // teal saturé
@@ -189,7 +186,6 @@ const DEFAULT_ICONS: Record<ItemType, string> = {
   plane: '✈️',
   website: '🔗',
   domain: '🌍',
-  subdomain: '🧩',
   document: '📄',
   financial: '💳',
   event: '📅',
@@ -214,7 +210,7 @@ const DEFAULT_ICONS: Record<ItemType, string> = {
   breach: '🔓',
   webtracker: '🎯',
   session: '🔐',
-  dns: '🌐',
+  dnsrecord: '🌐',
   ssl: '🔒',
   message: '💬',
   malware: '🦠',
@@ -246,7 +242,6 @@ const DEFAULT_SIZES: Record<ItemType, number> = {
   plane: 12, // Small-medium
   website: 14, // Medium
   domain: 20, // Large
-  subdomain: 16, // Medium-large
   document: 12, // Small-medium
   financial: 18, // Medium-large
   event: 12, // Small-medium
@@ -271,7 +266,7 @@ const DEFAULT_SIZES: Record<ItemType, number> = {
   breach: 20, // Large - security important
   webtracker: 12, // Small-medium
   session: 10, // Small
-  dns: 16, // Medium-large
+  dnsrecord: 16, // Medium-large
   ssl: 16, // Medium-large
   message: 12, // Small-medium
   malware: 24, // Large - security critical

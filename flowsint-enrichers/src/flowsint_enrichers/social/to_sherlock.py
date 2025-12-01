@@ -1,5 +1,6 @@
 from typing import List
 from flowsint_core.core.enricher_base import Enricher
+from flowsint_enrichers.registry import flowsint_enricher
 from flowsint_core.core.logger import Logger
 from flowsint_types import SocialAccount, Username 
 from tools.social.sherlock import SherlockTool 
@@ -7,7 +8,6 @@ from tools.social.sherlock import SherlockTool
 # Import the decorator if needed
 # from flowsint_enrichers.registry import flowsint_enricher
 
-# @flowsint_enricher # Uncomment if necessary
 class SherlockEnricher(Enricher):
     """Scans usernames for linked social accounts using the Sherlock Tool."""
 
