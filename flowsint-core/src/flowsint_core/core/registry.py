@@ -28,6 +28,7 @@ from flowsint_enrichers.cidr.to_ips import CidrToIpsEnricher
 # Social media enrichers
 from flowsint_enrichers.organization.to_domains import OrgToDomainsEnricher
 from flowsint_enrichers.social.to_maigret import MaigretEnricher
+from flowsint_enrichers.social.to_sherlock import SherlockEnricher
 
 # Organization-related enrichers
 from flowsint_enrichers.organization.to_asn import OrgToAsnEnricher
@@ -49,6 +50,7 @@ from flowsint_enrichers.website.to_webtrackers import WebsiteToWebtrackersEnrich
 # Email-related enrichers
 from flowsint_enrichers.email.to_gravatar import EmailToGravatarEnricher
 from flowsint_enrichers.email.to_leaks import EmailToBreachesEnricher
+from flowsint_enrichers.email.to_breachvip import EmailToBreachVipEnricher
 
 # Phone-related enrichers
 
@@ -59,8 +61,8 @@ from flowsint_enrichers.individual.to_org import IndividualToOrgEnricher
 from flowsint_enrichers.n8n.connector import N8nConnector
 
 # Dummy
-from flowsint_enrichers.ip.to_dummy_domains import IpToDummyDomainsEnricher
-from flowsint_enrichers.domain.to_dummy_ip import DomainToDummyIpEnricher
+#from flowsint_enrichers.ip.to_dummy_domains import IpToDummyDomainsEnricher
+#from flowsint_enrichers.domain.to_dummy_ip import DomainToDummyIpEnricher
 
 
 class EnricherRegistry:
@@ -174,6 +176,7 @@ EnricherRegistry.register(CidrToIpsEnricher)
 
 # Social media enrichers
 EnricherRegistry.register(MaigretEnricher)
+EnricherRegistry.register(SherlockEnricher)
 
 # Organization-related enrichers
 EnricherRegistry.register(OrgToAsnEnricher)
@@ -203,5 +206,5 @@ EnricherRegistry.register(IndividualToDomainsEnricher)
 EnricherRegistry.register(N8nConnector)
 
 # Dummy
-EnricherRegistry.register(IpToDummyDomainsEnricher)
-EnricherRegistry.register(DomainToDummyIpEnricher)
+#EnricherRegistry.register(IpToDummyDomainsEnricher)
+#EnricherRegistry.register(DomainToDummyIpEnricher)

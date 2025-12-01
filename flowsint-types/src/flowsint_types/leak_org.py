@@ -1,6 +1,5 @@
 from typing import List, Dict, Optional, Self
-# Importeer ConfigDict voor Pydantic v2 configuratie
-from pydantic import Field, model_validator, ConfigDict 
+from pydantic import Field, model_validator
 
 from .flowsint_base import FlowsintType
 from .registry import flowsint_type
@@ -10,10 +9,6 @@ from .registry import flowsint_type
 class Leak(FlowsintType):
     """Represents a data leak or breach with associated data."""
 
-    # FIX: Laat de Leak klasse extra velden accepteren die niet zijn gedefinieerd.
-    # Dit is nodig voor tijdelijke velden zoals 'original_email'.
-    model_config = ConfigDict(extra='allow')
-    
     name: str = Field(
         ..., description="The name of the leak or service brea", title="Leak Name", json_schema_extra={"primary": True}
     )
