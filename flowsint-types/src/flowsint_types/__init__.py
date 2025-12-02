@@ -49,6 +49,7 @@ from .weapon import Weapon
 from .web_tracker import WebTracker
 from .website import Website
 from .whois import Whois
+from .judgment import Judgment
 
 from typing import Dict, Type, Any, Optional
 from pydantic import BaseModel
@@ -110,6 +111,7 @@ __all__ = [
     "flowsint_type",
     "get_type",
     "FlowsintType",
+    "Judgment",
 ]
 
 
@@ -155,6 +157,7 @@ TYPE_TO_MODEL: Dict[str, Type[BaseModel]] = {
     "webtracker": WebTracker,
     "weapon": Weapon,
     "whois": Whois,
+    "judgment": Judgment,
 }
 
 
