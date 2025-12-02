@@ -53,7 +53,7 @@ class IndividualToWikipediaEnricher(Enricher):
 
         # STAP 1: Voeg de User-Agent header toe. Dit is cruciaal voor de Wikipedia API (403 fix).
         headers = {
-            "User-Agent": "Flowsint-Enricher-Project/1.0 (Contact: ilja@nas01.nl)" 
+            "User-Agent": "Flowsint-Enricher-Project/1.0" 
         }
 
         async with httpx.AsyncClient(headers=headers) as client: # <-- Gebruik de headers hier
